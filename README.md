@@ -1,6 +1,6 @@
 # 「 春节游戏」过年的压岁钱，我真的不能收！
 
-![](https://raw.githubusercontent.com/tzhiy/image-repo/main/blog/image-20220111145725922.png?token=APUDWWSQSD4ARMWXWHB7I33B3U3ZM)
+![](https://raw.githubusercontent.com/tzhiy/image-repo/main/blog/image-20220111145725922.png)
 
 >在线体验：[https://red-envelope.web.cloudendpoint.cn/](https://red-envelope.web.cloudendpoint.cn/)
 >
@@ -14,17 +14,17 @@
 
 在游戏中，我们需要扮演孩子的角色来应对亲戚的压岁钱。
 
-![](https://raw.githubusercontent.com/tzhiy/image-repo/main/blog/image-20220111150543006.png?token=APUDWWWXTAQ4LFEDF2TGCJLB3U34I)
+![](https://raw.githubusercontent.com/tzhiy/image-repo/main/blog/image-20220111150543006.png)
 
 游戏开始后，屏幕下方的进度条会向左做随机速度的移动，我们每次点击屏幕，指针就会向右移动一段固定距离。
 
 倒计时结束时，如果指针停留在有效区域，你就能获得红包了！
 
-![](https://raw.githubusercontent.com/tzhiy/image-repo/main/blog/image-20220111150953725.png?token=APUDWWWXRLAHMKTQKPWJAQLB3U4AG)
+![](https://raw.githubusercontent.com/tzhiy/image-repo/main/blog/image-20220111150953725.png)
 
 如果指针在游戏过程中碰到进度条的边缘，那么游戏就会失败，压岁钱会缓缓离你而去。
 
-![](https://raw.githubusercontent.com/tzhiy/image-repo/main/blog/image-20220111154632340.png?token=APUDWWS6KRDAYH2BENBZO3LB3U4BA)
+![](https://raw.githubusercontent.com/tzhiy/image-repo/main/blog/image-20220111154632340.png)
 
 ## 代码说明
 
@@ -151,7 +151,7 @@ const hangHands = () => {
 
 ### 对话框的样式
 
-![](https://raw.githubusercontent.com/tzhiy/image-repo/main/blog/image-20220111154043496.png?token=APUDWWUBRZ3KHDUWSUZKLELB3U4AM)
+![](https://raw.githubusercontent.com/tzhiy/image-repo/main/blog/image-20220111154043496.png)
 
 对话框下方有一个三角部分，使用伪类实现，这里通过两个伪类的错开叠加实现边框的效果（展示的代码经过简化）：
 
