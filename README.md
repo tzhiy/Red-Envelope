@@ -1,4 +1,4 @@
-# 「 春节游戏」过年的压岁钱，我真的不能收！
+# 「 春节游戏 」过年的压岁钱，我真的不能收！
 
 ![](https://raw.githubusercontent.com/tzhiy/image-repo/main/blog/image-20220111145725922.png)
 
