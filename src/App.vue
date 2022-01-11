@@ -35,7 +35,7 @@
         >
       </div>
       <div class="aside__item aside__link">
-        <a href="https://juejin.cn/user/871236495218264" target="_blank"
+        <a href="https://juejin.cn/post/7051861310526455838/" target="_blank"
           >掘金</a
         >
       </div>
