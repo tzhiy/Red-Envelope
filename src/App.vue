@@ -233,7 +233,7 @@ const useProgressEffect = (pointer, vaildArea, isShowPlot) => {
     isWin.value = false;
     isLose.value = false;
     pointDistance = maxLength / 2;
-    length = 300;
+    length = 240;
     validStart = Math.random() * length - length + maxLength / 2;
     vaildArea._rawValue.style.left = validStart + "px";
     vaildArea._rawValue.style.width = length + "px";
@@ -248,7 +248,7 @@ const useProgressEffect = (pointer, vaildArea, isShowPlot) => {
   const handleProgress = () => {
     // 剧情结束后才能操作
     if (plotIsOver) {
-      pointDistance += 320;
+      pointDistance += 140;
     }
   };
   // 初始化指针，倒计时
@@ -256,14 +256,19 @@ const useProgressEffect = (pointer, vaildArea, isShowPlot) => {
     pointer._rawValue.style.left = maxLength / 2 + "px";
     const timer = setInterval(() => {
       time.value -= 0.01;
-      pointDistance -= 4;
-      console.log(pointDistance);
-      if (pointDistance <= 0 || pointDistance >= maxLength) {
+      pointDistance -= 3.6;
+      if (pointDistance <= 0) {
         isLose.value = true;
+        pointDistance = 0;
+        clearInterval(timer);
+      } else if (pointDistance >= maxLength) {
+        isLose.value = true;
+        pointDistance = maxLength - 10;
+        console.log(pointDistance);
         clearInterval(timer);
       }
-      if (Math.random() < 0.2 && pointDistance - 6 >= 4) {
-        pointDistance -= 6;
+      if (Math.random() < 0.2 && pointDistance >= 300) {
+        pointDistance -= 1.6;
       }
       pointer._rawValue.style.left = pointDistance + "px";
       if (time.value < 0.01) {
