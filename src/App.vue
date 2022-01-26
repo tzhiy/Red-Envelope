@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="game-container" @click="handleProgress">
+    <main class="game-container" @click="handleProgress">
       <div class="time">
         <span class="time__content">
           {{ time.toFixed(2) }}
@@ -27,21 +27,30 @@
       <div class="plot" v-show="isShowPlot" @click="handleHidePlot">
         {{ plotContent }}
       </div>
-    </div>
-    <div class="aside">
-      <div class="aside__item aside__link">
+    </main>
+    <header class="header">
+      <div class="header__item header__link">
         <a href="https://github.com/tzhiy/Red-Envelope" target="_blank"
           >github</a
         >
       </div>
-      <div class="aside__item aside__link">
+      <div class="header__item header__link">
         <a href="https://juejin.cn/post/7051861310526455838/" target="_blank"
           >掘金</a
         >
       </div>
-      <div class="aside__item aside__title">{{ titleContent }}</div>
+      <div class="header__item header__audio" @click="handleAudio">
+        {{ isAudio ? "🔊" : "🔈" }}
+      </div>
       <div
-        class="aside__item aside__help"
+        class="header__item header__difficulty"
+        @click="handleChangeDifficulty"
+      >
+        {{ difficulty }}
+      </div>
+      <div class="header__item header__title">{{ titleContent }}</div>
+      <div
+        class="header__item header__help"
         @mouseenter="() => handleShowHelp(true)"
         @mouseleave="() => handleShowHelp(false)"
       >
@@ -49,10 +58,25 @@
       </div>
       <div class="help" v-show="isShowHelp">
         谁不想要压岁钱呢？🥰<br />
-        游戏开始后，点击屏幕操作进度条上的指针，倒计时结束时如果指针停留在有效区域，你就能获得红包了！
+        1.
+        游戏开始后，你需要通过点击鼠标操作下方进度条上的游标，倒计时结束时如果游标停留在橙色区域内，你就能获得红包了！<br />
+        2. 点击左侧的难度标签可以切换难度<br />
+        <p>1. 简单模式速度 * 1；</p>
+        <p>2. 困难模式速度 * 1.6；</p>
+        <p>
+          3. 无尽模式速度 * 1，每次通关后速度随机增加 0.04 ~
+          0.40，看看你能坚持到第几波~
+        </p>
       </div>
-      <div class="aside__item aside__start" @click="handleStart">开始游戏</div>
-    </div>
+      <div class="header__item header__start" @click="handleStart">
+        开始游戏
+      </div>
+    </header>
+    <audio
+      src="http://dl.stream.qqmusic.qq.com/C4000042Ep7K2IXmF0.m4a?guid=1342169660&vkey=6ECCCC6B623EB23CC7EBFEB9EF7C8271D6EDFE30AD5999C34718D2D93D7CE7826CB7D20464833A8751ACCABFB927AB193712AFA7277D5D5C&uin=2570986081&fromtag=66"
+      loop="true"
+      ref="audioRef"
+    ></audio>
   </div>
 </template>
 
@@ -60,12 +84,13 @@
 import { ref, watch } from "vue";
 
 // 点击开始游戏，初始化所有内容
-const useStartGameEffect = (startProcess, time) => {
+const useStartGameEffect = (time) => {
+  const startProcess = ref(false);
   const handleStart = () => {
     startProcess.value = true;
     time.value = 15;
   };
-  return { handleStart };
+  return { startProcess, handleStart };
 };
 
 // 开始游戏流程
@@ -77,34 +102,60 @@ const useGameProcessEffect = (
   progress,
   isWin,
   isLose,
-  startProcess
+  startProcess,
+  difficulty,
+  speedMuti,
+  handleStart
 ) => {
   const startGameProcess = () => {
     showStartPlot();
   };
 
   const titleContent = ref("我真的不要压岁钱！");
-
+  let successedTime = 0;
   watch(isShowPlot, (newValue) => {
     if (newValue === false) {
-      titleContent.value = "我真的不要压岁钱！";
+      if (difficulty.value === "无尽") {
+        titleContent.value = `速度 * ${speedMuti.value.toFixed(
+          2
+        )}，已获得 🧧 ${successedTime} 个`;
+      } else {
+        titleContent.value = "我真的不要压岁钱！";
+      }
       initHands();
       setTimeout(() => {
         hangHands();
         progress();
       }, 500);
-      watch(isWin, (newValue) => {
-        if (newValue) {
-          titleContent.value = "你获得了压岁钱！😋";
-          startProcess.value = false;
-        }
-      });
-      watch(isLose, (newValue) => {
-        if (newValue) {
-          titleContent.value = "你失去了压岁钱！😭";
-          startProcess.value = false;
-        }
-      });
+    }
+  });
+  watch(isWin, (newValue) => {
+    if (newValue) {
+      if (difficulty.value === "无尽") {
+        successedTime++;
+        titleContent.value = `速度 * ${speedMuti.value.toFixed(
+          2
+        )}，已获得 🧧 ${successedTime} 个`;
+        startProcess.value = false;
+        speedMuti.value += Math.ceil(Math.random() / 0.1) * 0.04;
+        handleStart();
+        startGameProcess();
+      } else {
+        titleContent.value = "你获得了压岁钱！😋";
+        startProcess.value = false;
+      }
+    }
+  });
+  watch(isLose, (newValue) => {
+    if (newValue) {
+      if (difficulty.value === "无尽") {
+        titleContent.value = `游戏结束，最终获得 🧧 ${successedTime} 个！✌`;
+        speedMuti.value = 1;
+        successedTime = 0;
+      } else {
+        titleContent.value = "你失去了压岁钱！😭";
+      }
+      startProcess.value = false;
     }
   });
   return { startGameProcess, titleContent };
@@ -176,7 +227,7 @@ const useHandsEffect = (leftHand, rightHand, isLose) => {
   return { initHands, hangHands };
 };
 
-// 用 time 来随机对话框
+// 随机对话框
 const useDialogChangeEffect = (time) => {
   const myDialogList = ref([
     "使不得使不得！",
@@ -194,6 +245,8 @@ const useDialogChangeEffect = (time) => {
     "不用看你妈脸色，收下吧！",
     "收下收下，应该的嘛",
     "压岁习俗不能省！",
+    "钱多钱少都是心意",
+    "讨个好彩头，吉祥如意",
   ]);
   const myDialogContent = ref("使不得使不得！");
   const relativeDialogContent = ref("快拿着快拿着！");
@@ -220,7 +273,7 @@ const useDialogChangeEffect = (time) => {
 };
 
 // 进度条的操作
-const useProgressEffect = (pointer, vaildArea, isShowPlot) => {
+const useProgressEffect = (pointer, vaildArea, isShowPlot, speedMuti) => {
   const maxLength = 968;
   const isWin = ref(false);
   const isLose = ref(false);
@@ -244,19 +297,27 @@ const useProgressEffect = (pointer, vaildArea, isShowPlot) => {
       plotIsOver = true;
     }
   });
+  // 游标每秒的移动距离
+  let pointDisPerSec = 3.6;
+  // 玩家操作每秒移动的距离
+  let pointDisPlayer = 140;
+  watch(speedMuti, (newValue) => {
+    pointDisPerSec = 3.6 * newValue;
+    pointDisPlayer = 140 * newValue;
+  });
   // 玩家的操作
   const handleProgress = () => {
     // 剧情结束后才能操作
     if (plotIsOver) {
-      pointDistance += 140;
+      pointDistance += pointDisPlayer;
     }
   };
-  // 初始化指针，倒计时
+  // 初始化游标，倒计时
   const initPointer = () => {
     pointer._rawValue.style.left = maxLength / 2 + "px";
     const timer = setInterval(() => {
       time.value -= 0.01;
-      pointDistance -= 3.6;
+      pointDistance -= pointDisPerSec;
       if (pointDistance <= 0) {
         isLose.value = true;
         pointDistance = 0;
@@ -264,7 +325,6 @@ const useProgressEffect = (pointer, vaildArea, isShowPlot) => {
       } else if (pointDistance >= maxLength) {
         isLose.value = true;
         pointDistance = maxLength - 10;
-        console.log(pointDistance);
         clearInterval(timer);
       }
       if (Math.random() < 0.2 && pointDistance >= 300) {
@@ -300,19 +360,59 @@ const useShowHelpEffect = () => {
   return { isShowHelp, handleShowHelp };
 };
 
+// 难度设置
+const useDifficultyEffect = () => {
+  const difficultys = ["简单", "困难", "无尽"];
+  const speedMutis = [1, 1.6, 1];
+  const difficulty = ref("简单");
+  const speedMuti = ref(1);
+  let i = 0;
+  const handleChangeDifficulty = () => {
+    const index = ++i % difficultys.length;
+    difficulty.value = difficultys[index];
+    speedMuti.value = speedMutis[index];
+  };
+  return {
+    difficulty,
+    speedMuti,
+    handleChangeDifficulty,
+  };
+};
+
+// 音乐设置
+const useAudioEffect = (audioRef) => {
+  const isAudio = ref(false);
+  const handleAudio = () => {
+    if (isAudio.value) {
+      audioRef.value.pause();
+    } else {
+      audioRef.value.play();
+    }
+    isAudio.value = !isAudio.value;
+  };
+  return {
+    isAudio,
+    handleAudio,
+  };
+};
+
 export default {
   setup() {
     const leftHand = ref(null);
     const rightHand = ref(null);
     const pointer = ref(null);
     const vaildArea = ref(null);
-    let startProcess = ref(false);
+    const audioRef = ref(null);
+    const { isAudio, handleAudio } = useAudioEffect(audioRef);
+    const { difficulty, speedMuti, handleChangeDifficulty } =
+      useDifficultyEffect();
     const { isShowPlot, plotContent, handleHidePlot, showStartPlot } =
       useHeadPlotEffect();
     const { progress, isWin, isLose, handleProgress, time } = useProgressEffect(
       pointer,
       vaildArea,
-      isShowPlot
+      isShowPlot,
+      speedMuti
     );
     const { initHands, hangHands } = useHandsEffect(
       leftHand,
@@ -322,6 +422,7 @@ export default {
     const { myDialogContent, relativeDialogContent } =
       useDialogChangeEffect(time);
     const { isShowHelp, handleShowHelp } = useShowHelpEffect();
+    const { startProcess, handleStart } = useStartGameEffect(time);
     const { startGameProcess, titleContent } = useGameProcessEffect(
       isShowPlot,
       showStartPlot,
@@ -330,11 +431,13 @@ export default {
       progress,
       isWin,
       isLose,
-      startProcess
+      startProcess,
+      difficulty,
+      speedMuti,
+      handleStart
     );
-    const { handleStart } = useStartGameEffect(startProcess, time);
     watch(startProcess, (newValue) => {
-      if (newValue === true) {
+      if (newValue) {
         startGameProcess();
       }
     });
@@ -356,6 +459,11 @@ export default {
       relativeDialogContent,
       isShowHelp,
       handleShowHelp,
+      difficulty,
+      handleChangeDifficulty,
+      isAudio,
+      handleAudio,
+      audioRef,
     };
   },
 };
@@ -530,7 +638,7 @@ body {
   font-weight: bold;
 }
 
-.aside {
+.header {
   position: absolute;
   display: flex;
   justify-content: center;
@@ -539,7 +647,7 @@ body {
   transform: translate(-50%, -368px);
   height: 60px;
   width: 1100px;
-  background-color: rgb(235, 92, 49);
+  background-color: rgb(250, 87, 37);
   border: 4px solid black;
   font-weight: bold;
   line-height: 48px;
@@ -553,21 +661,50 @@ body {
     background-color: rgb(255, 230, 0);
   }
   &__link {
-    flex: 1;
-    margin-right: 20px;
+    flex: 2;
+    margin-right: 10px;
+  }
+  &__audio {
+    flex: 2;
+  }
+  &__difficulty {
+    flex: 4;
+    margin-left: 40px;
+    background-color: rgb(255, 153, 0);
+    cursor: pointer;
   }
   &__title {
-    flex: 7;
-    margin-left: 180px;
+    flex: 12;
+    margin-left: 10px;
     margin-right: 10px;
     font-family: "Comic Sans MS";
   }
   &__help {
-    flex: 1;
-    margin-right: 20px;
+    flex: 2;
+    margin-right: 60px;
   }
   &__start {
-    flex: 4;
+    flex: 8;
+  }
+  .help {
+    position: absolute;
+    width: 400px;
+    left: 660px;
+    top: 60px;
+    background-color: rgb(255, 243, 136);
+    text-align: left;
+    font-size: 18px;
+    border-radius: 12px;
+    border: 2px solid black;
+    box-sizing: border-box;
+    padding: 4px 10px;
+    line-height: 40px;
+    p {
+      padding: 0;
+      margin: 0 0 0 16px;
+      font-size: 16px;
+      line-height: 32px;
+    }
   }
 }
 
@@ -601,20 +738,6 @@ body {
     background-position: left;
     z-index: 3;
   }
-}
-
-.help {
-  position: absolute;
-  width: 300px;
-  left: 660px;
-  top: 60px;
-  background-color: rgb(255, 243, 136);
-  text-align: left;
-  font-size: 18px;
-  border-radius: 12px;
-  border: 2px solid black;
-  box-sizing: border-box;
-  padding: 4px 10px;
 }
 
 a {
