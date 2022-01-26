@@ -61,11 +61,11 @@
         1.
         游戏开始后，你需要通过点击鼠标操作下方进度条上的游标，倒计时结束时如果游标停留在橙色区域内，你就能获得红包了！<br />
         2. 点击左侧的难度标签可以切换难度<br />
-        <p>1. 简单模式速度 * 1；</p>
-        <p>2. 困难模式速度 * 1.6；</p>
+        <p>1. 简单模式：基础速度 * 1；</p>
+        <p>2. 困难模式：基础速度 * 1.6；</p>
         <p>
-          3. 无尽模式速度 * 1，每次通关后速度随机增加 0.04 ~
-          0.40，看看你能坚持到第几波~
+          3. 无尽模式：基础速度 * 1，每次通关后速度随机增加 0.03 ~
+          0.30，看看你能坚持到第几波~
         </p>
       </div>
       <div class="header__item header__start" @click="handleStart">
@@ -76,6 +76,7 @@
       src="http://dl.stream.qqmusic.qq.com/C4000042Ep7K2IXmF0.m4a?guid=1342169660&vkey=6ECCCC6B623EB23CC7EBFEB9EF7C8271D6EDFE30AD5999C34718D2D93D7CE7826CB7D20464833A8751ACCABFB927AB193712AFA7277D5D5C&uin=2570986081&fromtag=66"
       loop="true"
       ref="audioRef"
+      volume="0.4"
     ></audio>
   </div>
 </template>
@@ -137,7 +138,7 @@ const useGameProcessEffect = (
           2
         )}，已获得 🧧 ${successedTime} 个`;
         startProcess.value = false;
-        speedMuti.value += Math.ceil(Math.random() / 0.1) * 0.04;
+        speedMuti.value += Math.ceil(Math.random() / 0.1) * 0.03;
         handleStart();
         startGameProcess();
       } else {
